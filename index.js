@@ -34,7 +34,7 @@ async function run() {
      * API Naming Convention
     */
 
-app.post
+app.post('/booking', async(rep, res))
 
     });
   } finally {
