@@ -24,9 +24,7 @@ async function run() {
     const bookingCollection = client.db("doctors_portal").collection("booking");
 
 
-    /**
-     * API Naming Convention
-    */
+ 
 
     app.get("/service", async (req, res) => {
       const query = {};
