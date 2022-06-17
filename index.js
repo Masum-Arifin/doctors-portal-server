@@ -35,7 +35,7 @@ async function run() {
     */
 
 app.post('/booking', async(rep, res) =>{
-  
+  const booking = req.body;
 })
 
     });
