@@ -20,9 +20,13 @@ async function run() {
   try {
     await client.connect();
     console.log("database connected");
-    const serviceCollection = client
-      .db("doctors_portal")
-      .collection("services");
+    const serviceCollection = client.db("doctors_portal").collection("services");
+    const bookingCollection = client.db("doctors_portal").collection("booking");
+
+
+    /**
+     * API Naming Convention
+    */
 
     app.get("/service", async (req, res) => {
       const query = {};
