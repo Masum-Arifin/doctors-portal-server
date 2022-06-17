@@ -30,7 +30,9 @@ async function run() {
       const services = await cursor.toArray();
       res.send(services);
 
-      
+   /**
+     * API Naming Convention
+    */
     });
   } finally {
   }
