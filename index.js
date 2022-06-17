@@ -29,6 +29,8 @@ async function run() {
       const cursor = serviceCollection.find(query);
       const services = await cursor.toArray();
       res.send(services);
+
+      
     });
   } finally {
   }
