@@ -37,7 +37,7 @@ async function run() {
 app.post('/booking', async(rep, res) =>{
   const booking = req.body;
   const query = {treatment: booking.treatment, date: booking.date, patient: booking.patient}
-const exixts = await bookingCollection.findOne
+const exixts = await bookingCollection.findOne()
   const result = await bookingCollection.insertOne(booking);
   res.send(result);
 })
