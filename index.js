@@ -39,7 +39,7 @@ app.post('/booking', async(rep, res) =>{
   const query = {treatment: booking.treatment, date: booking.date, patient: booking.patient}
 const exits = await bookingCollection.findOne(query)
 if(exits){
-  return
+  return 
 }
   const result = await bookingCollection.insertOne(booking);
   res.send(result);
