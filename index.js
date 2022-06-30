@@ -42,7 +42,7 @@ if(exits){
   return res.send({success: false, booking: exits})
 }
   const result = await bookingCollection.insertOne(booking);
-  res.send({success result});
+  res.send({success: result});
 })
 
     });
