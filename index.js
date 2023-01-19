@@ -17,6 +17,21 @@ const client = new MongoClient(uri, {
   serverApi: ServerApiVersion.v1,
 });
 
+function verifyJWT(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).send({ message: "UnAuthorized access" });
+  }
+  const token = authHeader.split(" ")[1];
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
+    if (err) {
+      return res.status(403).send({ message: "Forbidden access" });
+    }
+    req.decoded = decoded;
+    next();
+  });
+}
+
 async function run() {
   try {
     await client.connect();
@@ -25,7 +40,7 @@ async function run() {
       .db("doctors_portal")
       .collection("services");
     const bookingCollection = client.db("doctors_portal").collection("booking");
-    const userCollection = client.db("doctors_portal").collection('users');
+    const userCollection = client.db("doctors_portal").collection("users");
 
     app.get("/service", async (req, res) => {
       const query = {};
@@ -34,7 +49,7 @@ async function run() {
       res.send(services);
     });
 
-    app.put('/user/:email', async (req, res) => {
+    app.put("/user/:email", async (req, res) => {
       const email = req.params.email;
       const user = req.body;
       const filter = { email: email };
@@ -43,9 +58,13 @@ async function run() {
         $set: user,
       };
       const result = await userCollection.updateOne(filter, updateDoc, options);
-      const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '1h'});
-      res.send({result, token});
-    })
+      const token = jwt.sign(
+        { email: email },
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: "1h" }
+      );
+      res.send({ result, token });
+    });
 
     app.get("/available", async (req, res) => {
       const date = req.query.date;
@@ -80,8 +99,9 @@ async function run() {
      * app.patch('/booking'/:id) //
      * app.get('/booking'/:id)
      */
-    app.get("/booking", async (req, res) => {
+    app.get("/booking", verifyJWT, async (req, res) => {
       const patient = req.query.patient;
+
       const query = { patient: patient };
       const bookings = await bookingCollection.find(query).toArray();
       res.send(bookings);
