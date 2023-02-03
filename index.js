@@ -1,14 +1,30 @@
 const express = require("express");
 const cors = require("cors");
-const jwt = require("jsonwebtoken");
-require("dotenv").config();
-const { MongoClient, ServerApiVersion } = require("mongodb");
-
 const app = express();
+const { MongoClient, ServerApiVersion } = require("mongodb");
+require("dotenv").config();
+const jwt = require("jsonwebtoken");
+
 const port = process.env.PORT || 5000;
 
-app.use(cors());
 app.use(express.json());
+app.use(cors());
+const corsConfig = {
+  origin: "*",
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+};
+app.use(cors(corsConfig));
+app.options("*", cors(corsConfig));
+app.use(express.json());
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept,authorization"
+  );
+  next();
+});
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.xhqao28.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
@@ -101,15 +117,19 @@ async function run() {
      */
     app.get("/booking", verifyJWT, async (req, res) => {
       const patient = req.query.patient;
-
-      const query = { patient: patient };
-      const bookings = await bookingCollection.find(query).toArray();
-      res.send(bookings);
+      const decodedEmail = req.decoded.email;
+      if (patient !== decodedEmail) {
+        const query = { patient: patient };
+        const bookings = await bookingCollection.find(query).toArray();
+        return res.send(bookings);
+      } else {
+        return res.status(403).send({ message: "Forbidden access" });
+      }
     });
 
     app.post("/booking", async (req, res) => {
       const booking = req.body;
-      console.log(booking);
+      // console.log(booking);
 
       const query = {
         treatment: booking.treatment,
